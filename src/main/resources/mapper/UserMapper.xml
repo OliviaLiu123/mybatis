@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo_mybatis.mapper.UserMapper">
+
+    <!-- 插入用户 -->
+    <insert id="insertUser" parameterType="com.example.demo_mybatis.model.User">
+        INSERT INTO User (name, email, age)
+        VALUES (#{name}, #{email}, #{age})
+    </insert>
+
+    <!-- 根据ID查询用户 -->
+    <select id="getUserById" parameterType="int" resultType="com.example.demo_mybatis.model.User">
+        SELECT * FROM User WHERE id = #{id}
+    </select>
+
+    <!-- 更新用户 -->
+    <update id="updateUser" parameterType="com.example.demo_mybatis.model.User">
+        UPDATE User
+        SET name = #{name}, email = #{email}, age = #{age}
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除用户 -->
+    <delete id="deleteUser" parameterType="int">
+        DELETE FROM User WHERE id = #{id}
+    </delete>
+
+    <!-- 动态查询用户 -->
+    <select id="findUserByConditions" parameterType="map" resultType="com.example.demo_mybatis.model.User">
+        SELECT * FROM User
+        WHERE 1=1
+        <if test="userName != null and userName != ''">
+            AND name = #{userName}
+        </if>
+        <if test="age != null">
+            AND age = #{age}
+        </if>
+    </select>
+
+    <!-- 使用 <choose> 标签的动态查询 -->
+    <select id="findUsersByChoose" parameterType="map" resultType="com.example.demo_mybatis.model.User">
+        SELECT * FROM User
+        WHERE 1=1
+        <choose>
+            <when test="userName != null and userName != ''">
+                AND name = #{userName}
+            </when>
+            <when test="email != null and email != ''">
+                AND email = #{email}
+            </when>
+            <otherwise>
+                AND 1 = 1 <!-- 默认条件，确保 SQL 语法正确 -->
+            </otherwise>
+        </choose>
+    </select>
+
+
+    <resultMap id="userResultMap" type="com.example.demo_mybatis.model.User">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="age" column="age"/>
+    </resultMap>
+
+    <!-- 根据ID查询用户，并使用 <resultMap> 进行结果映射 -->
+    <select id="selectUserByIdWithResultMap" resultMap="userResultMap">
+        SELECT * FROM User WHERE id = #{id}
+    </select>
+
+</mapper>
+
